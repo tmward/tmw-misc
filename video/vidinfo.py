@@ -28,6 +28,7 @@ from shutil import which
 import subprocess
 import sys
 
+
 def parser():
     """Returns an argparse parser."""
     parser = argparse.ArgumentParser(
@@ -59,10 +60,25 @@ def valid_args(args):
     return True
 
 
+def all_files(directory):
+    """Returns all files in directory, recursing through subdirectories."""
+    return (os.path.join(dirp, f) for dirp, _, fs in os.walk(directory) for f in fs)
+
+
+def toplevel_files(directory):
+    """Returns all toplevel files in directory."""
+    with os.scandir(directory) as it:
+        for entry in it:
+            if entry.is_file():
+                yield entry.path
+
+
 def main():
-    args = parser().parse_args("asdf".split())
+
+    args = parser().parse_args("/home/thomas/noBackup".split())
     if not valid_args(args):
         sys.exit(2)
+    files_within = toplevel_files if args.toplevel else all_files
 
 
 if __name__ == "__main__":

@@ -31,6 +31,48 @@ them in a specified output directory. It requires Python 3.6 or higher,
 the Python package [docopt](https://pypi.org/project/docopt/), and the
 [FFmpeg](https://ffmpeg.org/) software package.
 
+## `vidinfo.py`
+Python script that leverages `ffprobe` to report the following information for videos location in a directory:
+
+1. Filename
+2. Video stream number (0-indexed. Most videos only have one video stream.)
+3. Video codec name (standard name reported by ffmpeg/ffprobe)
+4. Width (pixels)
+5. Height (pixels)
+6. Video container format (standard name reported by ffmpeg/ffprobe)
+7. Duration (seconds)
+
+It will report one item per video stream in the video file. Most videos only have one stream.
+
+It requires `ffprobe` from the [FFmpeg](https://ffmpeg.org/) software package and Python 3.6 or higher.
+
+I designed it to easily slot into any data pipeline,
+so it can output in csv, tsv, or json formats.
+By default it outputs to standard output
+(and therefore works nice with pipes)
+, but it will take an optional filename to output to as well.
+
+Full help below:
+
+```
+$ ./vidinfo.py -h
+usage: vidinfo.py [-h] [-t] [-f {csv,json,tsv}] [-o OUTPUT] directory
+
+Collect video format/codec information.
+
+positional arguments:
+  directory             directory with videos
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -t, --toplevel        Only analyze videos in directory, not its
+                        subdirectories. (default: False)
+  -f {csv,json,tsv}, --format {csv,json,tsv}
+                        Output format (default: json)
+  -o OUTPUT, --output OUTPUT
+                        Output filename (default: -)
+```
+
 # Questions, comments, concerns
 Start an issue/PR or contact me over your preferred medium on my
 [contact](https://www.thomasward.com/contact/) page.

@@ -17,8 +17,8 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 """
-Outputs a csv with information on the container and video bitstream
-formats (codecs) of videos in the specified directory. Requires ffprobe
+Outputs information on the container and video bitstream formats
+(codecs) of videos in the specified directory. Requires ffprobe
 installed.
 """
 

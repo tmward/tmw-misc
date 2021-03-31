@@ -47,32 +47,32 @@ $ ./pp_dd.R mydfs.rds
 
 |variable |class     |description |
 |:--------|:---------|:-----------|
-|format   |character |            |
-|codec    |character |            |
+|`format` |character |            |
+|`codec`  |character |            |
 
 ## `video_origins`
 
-|variable    |class     |description |
-|:-----------|:---------|:-----------|
-|video_id    |character |            |
-|institution |character |            |
-|recorder    |character |            |
-|format      |character |            |
-|codec       |character |            |
-|file_total  |integer   |            |
-|trim_start  |integer   |            |
+|variable      |class     |description |
+|:-------------|:---------|:-----------|
+|`video_id`    |character |            |
+|`institution` |character |            |
+|`recorder`    |character |            |
+|`format`      |character |            |
+|`codec`       |character |            |
+|`file_total`  |integer   |            |
+|`trim_start`  |integer   |            |
 
 ## `videos`
 
-|variable |class     |description |
-|:--------|:---------|:-----------|
-|video_id |character |            |
-|format   |character |            |
-|codec    |character |            |
-|width    |integer   |            |
-|height   |integer   |            |
-|duration |numeric   |            |
-|complete |logical   |            |
+|variable   |class     |description |
+|:----------|:---------|:-----------|
+|`video_id` |character |            |
+|`format`   |character |            |
+|`codec`    |character |            |
+|`width`    |integer   |            |
+|`height`   |integer   |            |
+|`duration` |numeric   |            |
+|`complete` |logical   |            |
 
 $ 
 ```

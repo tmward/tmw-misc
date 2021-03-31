@@ -44,6 +44,7 @@ description_df  <- function(df) {
     df %>%
         map_chr(class) %>%
         enframe(name = "variable", value = "class") %>%
+        mutate(variable = paste0("`", variable, "`")) %>%
         mutate(description = "")
 }
 

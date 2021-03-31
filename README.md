@@ -22,6 +22,133 @@ sequence from i is one to n.
 I mainly use it to generate LaTeX formulas into vector graphics that are
 then used on my website.
 
+# R
+
+Collection of scripts useful when programming in R.
+
+## `pp_dd.R`
+Script that will pretty print (pp), in markdown,
+a data dictionary (dd) from a collection of dataframes/tibbles.
+The data dictionary is in the standard three column format,
+variable, class, description,
+used in [TidyTuesday](https://github.com/rfordatascience/tidytuesday),
+(e.g., [UN Votes data dictionary](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-03-23/readme.md#data-dictionary)).
+
+### Example
+
+`mydfs.rds` is a named list of three dataframes.
+By default, `pp_dd.R` prints with a markdown header level of 2
+(so each table name is preceded with "##"):
+
+```
+$ ./pp_dd.R mydfs.rds
+
+## `format_codecs`
+
+|variable |class     |description |
+|:--------|:---------|:-----------|
+|format   |character |            |
+|codec    |character |            |
+
+## `video_origins`
+
+|variable    |class     |description |
+|:-----------|:---------|:-----------|
+|video_id    |character |            |
+|institution |character |            |
+|recorder    |character |            |
+|format      |character |            |
+|codec       |character |            |
+|file_total  |integer   |            |
+|trim_start  |integer   |            |
+
+## `videos`
+
+|variable |class     |description |
+|:--------|:---------|:-----------|
+|video_id |character |            |
+|format   |character |            |
+|codec    |character |            |
+|width    |integer   |            |
+|height   |integer   |            |
+|duration |numeric   |            |
+|complete |logical   |            |
+
+$ 
+```
+
+### Help
+
+If you cannot remember the command line options,
+help is a `-h` away!
+
+```
+$ ./pp_dd.R -h
+Prints to standard output markdown to document R dataframes/tibbles.
+Requires an RDS file that is either 1. A dataframe with columns
+(name, df), with name, a character vector, and df, a list column holding
+dataframes/tibbles or 2. a named list of dataframes.
+
+It will output a markdown heading with the table name followed by a markdown
+table with columns "name", "class" (eg., integer, character, etc), and
+"description" (blank column for you to fill in).
+
+Usage: tidy_tcga.R [-h] [-l LEVEL] INPUTRDS
+
+Options:
+    -h          Print this menu and exit.
+    -l LEVEL    Markdown heading level, e.g. 1 is "#", 2 is "##" [default: 2].
+
+    Arguments:
+    INPUTRDS    R object saved in RDS format, either 2 column df
+                or named list.
+```
+
+### Input
+
+As input, it needs an RDS object that is either:
+
+- A named list of data frames (eg., `list("tbl1" = df(...), ..., "tbln" = df(...))`)
+
+or
+
+- A two column data frame, `df(name = c("tbl1", ..., "tbln"), df = list(df1, ..., dfn))`
+    - `name` is a character vectors of names
+    - `df` is a list column holding the dataframes
+
+### Output
+
+`pp_dd.R` outputs to standard output.
+If you want to save this as a file,
+use standard command line output redirection
+(`>` (to overwrite the specified file) or `>>`
+(to append to the specified file)):
+
+```
+$ ./pp_dd.R -h 1 mydfs.rds > my_readme.md
+```
+
+Output is markdown.
+There is a heading for each table
+followed by a markdown table to describe each table.
+This markdown table is styled in the usual three column format used by TidyTuesday:
+
+1. `variable`: column name
+2. `class`: type (e.g., integer, numeric, logical, etc.) of the column
+3. `description`: blank column for you to fill in with your documentation.
+
+You can control the heading level for the table name
+(e.g., "#" versus "##") with the `-l` flag.
+Default is 2, so "##".
+
+### Required R packages
+
+1. `docopt`
+2. `dplyr`
+3. `magrittr`
+4. `purrr`
+5. `tibble`
+
 # Videos
 
 ## `deidentify_videos.py`

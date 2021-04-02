@@ -199,6 +199,7 @@ Default is 2, so "##".
 3. `magrittr`
 4. `purrr`
 5. `tibble`
+6. `knitr`
 
 # Videos
 

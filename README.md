@@ -256,6 +256,7 @@ optional arguments:
 
 Python script that takes a directory with multiple video files
 and combines them into a single video file.
+The original video files are *not* modified.
 
 ### Overview
 

@@ -252,6 +252,153 @@ optional arguments:
                         Output filename (default: -)
 ```
 
+## `video_processor.py`
+
+Python script that takes a directory with multiple video files
+and combines them into a single video file.
+
+### Overview
+
+It performs the actions below.
+Note, that all are performed by default,
+but each can individually be turned off via command-line options:
+
+1. Concatenates (joins) videos together, asking the user for their
+   desired ordering of the videos.
+2. Trims excess video from the start and end of the joined video by
+   prompting the user for the timestamps where they want their final
+   video to start and end.
+3. Removes audio track if present.
+4. Converts video to have an mp4 container, transcoding any audio/video
+   codecs that are not compatible with an mp4 container in the process,
+   if necessary. Output video codec, if transcoding is needed, is h264
+   encoded with a constant rate factor of 18 to minimize loss during
+   transcoding.
+5. Strips excess metadata (read more on the dangers of video metadata
+   [here](https://thomasward.com/video-metadata/))
+6. Outputs:
+    1. Single mp4 file in the video directory with either a random
+       video name
+       (32 hexadecimal digit [UUID4](https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_(random)))
+       or a user-specified video name.
+    2. Log in json format that holds `ffprobe` information for the
+       original videos (after they were concatenated) and the final
+       output video.
+
+It uses [`ffmpeg`](https://ffmpeg.org/) for the video processing.
+It requires Python 3.6 or higher and my Python package
+[pyask](https://pypi.org/project/pyask/).
+
+### Example use
+
+Video recorders often split a single "video" into multiple smaller videos.
+For example, take the following directory full of videos:
+
+```
+$ ls example_video_directory
+vid20190625-081711.avi  vid20190625-084933.avi  vid20190625-092155.avi
+```
+
+I can run `video_processor.py` to join them together,
+in whatever order I would like,
+then remove excess video from the starts and end,
+remove the audio track,
+convert them from an avi container to an mp4 container,
+remove excess identifying metadata, and
+output an mp4 with a random filename and
+a json log file.
+See below for output from an example run,
+where I wanted to only use the 2nd and 3rd video in the directory,
+and extract only time 1:00 to time 13:30:
+
+```
+$ ./video_processor.py example_video_directory
+Available choices are:
+(0) vid20190625-081711.avi
+(1) vid20190625-084933.avi
+(2) vid20190625-092155.avi
+Which videos, in order, should be stitched together? (space/comma separated number(s)) [0, 1, 2] 1 2
+Does the video need to be trimmed? (yes or no) [yes]
+What time should trim start? (enter time in HH:MM:SS, MM:SS, or SS format) [] 1:00
+What time should trim end? (enter time in HH:MM:SS, MM:SS, or SS format) [] 13:30
+Final video saved as
+"example_video_directory/b5cdf88919a344109311324a67ca4205.mp4".
+$
+```
+
+You can see what the directory looks like after running:
+
+```
+$ ls example_video_directory
+b5cdf88919a344109311324a67ca4205.mp4  log_202104291232.json
+vid20190625-081711.avi  vid20190625-084933.avi  vid20190625-092155.avi
+$
+```
+
+And the format of the log file:
+
+```
+$ cat example_video_directory/log_202104291232.json
+{
+  "original": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "mpeg4",
+        "width": 1280,
+        "height": 720
+      }
+    ],
+    "format": {
+      "filename": "tmpczwukxt2/71ef7566386042a280b640935cac60c5.avi",
+      "format_name": "avi",
+      "duration": "3508.966667"
+    }
+  },
+  "final": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "mpeg4",
+        "width": 1280,
+        "height": 720
+      }
+    ],
+    "format": {
+      "filename": "b5cdf88919a344109311324a67ca4205.mp4",
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "duration": "750.000000"
+    }
+  }
+}
+```
+
+### Help
+Help is a `-h` away:
+
+```
+$ ./video_processor.py -h
+usage: video_processor.py [-h] [-o OUTPUT] [-l] [-a] [-f] [-m] [-t] directory
+
+Combine videos in a directory into one, de-identified, video.
+
+positional arguments:
+  directory             directory with videos
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Output filename. If none provided, generates random
+                        filename. (default: None)
+  -l, --no-log          Do not save json log file. (default: False)
+  -a, --keep-audio      Keep audio in final video. (default: False)
+  -f, --keep-format     Do not convert final video to mp4. (default: False)
+  -m, --keep-metadata   Do not strip metadata from final video. (default:
+                        False)
+  -t, --no-trim         Do not offer to trim the video. (default: False)
+$
+```
+
 # Questions, comments, concerns
 Start an issue/PR or contact me over your preferred medium on my
 [contact](https://www.thomasward.com/contact/) page.

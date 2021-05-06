@@ -106,7 +106,7 @@ def validate_args(args):
             stderr_and_exit(f"{args.output} already exists. Exiting.")
         out_ext = os.path.splitext(args.output)[1]
         if out_ext not in vid_exts:
-            stderr_and_exit(f"Output file must have a valid video extension. Exiting.")
+            stderr_and_exit("Output file must have a valid video extension. Exiting.")
         if not args.keep_format and out_ext != ".mp4":
             stderr_and_exit('Output file must have "mp4" extension. Exiting.')
     return args
@@ -179,16 +179,16 @@ def make_ffmpeg_concat_file(videos, workdir):
 def concat(infiles, outfile, workdir):
     """
     Takes a list of string filenames for videos, concats with ffmpeg,
-    and returns concated filename. This requires videos to have same
-    codec.
+    and returns tuple of concated filename and number of videos
+    concatenated. This requires videos to have same codec.
     """
     if len(infiles) == 1:
-        return infiles[0]
+        return (infiles[0], 1)
     videos = pyask.which_items(
         infiles,
         "Which videos, in order, should be stitched together?",
         allow_repeats=False,
-        default = ', '.join(map(str, range(0, len(infiles))))
+        default=", ".join(map(str, range(0, len(infiles)))),
     )
     run(
         [
@@ -206,7 +206,7 @@ def concat(infiles, outfile, workdir):
             outfile,
         ]
     )
-    return outfile
+    return (outfile, len(videos))
 
 
 def get_trim_times():
@@ -220,7 +220,7 @@ def get_trim_times():
 
 
 def trim(infile, outfile):
-    """Trim video with ffmpeg."""
+    """Trim video with ffmpeg. Returns tuple of filename and dict of trim times"""
     if not pyask.yes_no("Does the video need to be trimmed?", default="yes"):
         return infile
     start, end = get_trim_times()
@@ -248,7 +248,7 @@ def trim(infile, outfile):
             outfile,
         ]
     )
-    return outfile
+    return (outfile, {"start": start, "end": end})
 
 
 def remove_audio(infile, outfile):
@@ -388,21 +388,28 @@ def main():
     final_video = args.output if args.output is not None else random_videoname()
     final_extension = os.path.splitext(final_video)[1].casefold()
     try:
-        inprocess_video = concat(videos, next_name(og_extension), workdir)
+        inprocess_video, video_count = concat(videos, next_name(og_extension), workdir)
         og_info = ffprobe(inprocess_video)
         if not args.no_trim:
-            inprocess_video = trim(inprocess_video, next_name(og_extension))
+            inprocess_video, trim_times = trim(inprocess_video, next_name(og_extension))
         if not args.keep_audio:
             inprocess_video = remove_audio(inprocess_video, next_name(og_extension))
         if not args.keep_format:
             inprocess_video = mp4(inprocess_video, next_name(".mp4"))
         if not args.keep_metadata:
-            inprocess_video = strip_metadata(inprocess_video, next_name(final_extension))
+            inprocess_video = strip_metadata(
+                inprocess_video, next_name(final_extension)
+            )
         os.rename(inprocess_video, final_video)
         final_info = ffprobe(final_video)
         if not args.no_log:
             save_json(
-                {"original": og_info, "final": final_info},
+                {
+                    "video_count": video_count,
+                    "original": og_info,
+                    "final": final_info,
+                    "trim_times": trim_times,
+                },
                 logname="log_" + current_datetime() + ".json",
             )
     except (OSError, RuntimeError) as err:

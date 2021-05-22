@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# video_processor.py,v1.0.0
+# video_processor.py,v1.0.1
 
 # Copyright (c) 2021 Thomas Ward <thomas@thomasward.com>
 #
@@ -222,7 +222,7 @@ def get_trim_times():
 def trim(infile, outfile):
     """Trim video with ffmpeg. Returns tuple of filename and dict of trim times"""
     if not pyask.yes_no("Does the video need to be trimmed?", default="yes"):
-        return infile
+        return (infile, {"start": 0, "end": None})
     start, end = get_trim_times()
     run(
         [
@@ -387,6 +387,8 @@ def main():
     og_extension = os.path.splitext(videos[0])[1].casefold()
     final_video = args.output if args.output is not None else random_videoname()
     final_extension = os.path.splitext(final_video)[1].casefold()
+    # need a default trim time
+    trim_times = {"start": 0, "end": None}
     try:
         inprocess_video, video_count = concat(videos, next_name(og_extension), workdir)
         og_info = ffprobe(inprocess_video)

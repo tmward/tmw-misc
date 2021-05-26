@@ -377,13 +377,13 @@ def random_videoname(extension=".mp4", directory=None):
 def main():
     """Processes a directory of video files into a single mp4 video."""
     args = validate_args(parser().parse_args())
-    workdir = make_workdir(args.directory)
-    # gen random names for videos to live in temporary "workdir"
-    next_name = partial(random_videoname, directory=workdir)
     os.chdir(args.directory)
     videos = [f for f in sorted(os.listdir()) if is_video(f)]
     if len(videos) == 0:
         stderr_and_exit(f"No video files found in '{os.getcwd()}'.")
+    workdir = make_workdir(args.directory)
+    # gen random names for videos to live in temporary "workdir"
+    next_name = partial(random_videoname, directory=workdir)
     og_extension = os.path.splitext(videos[0])[1].casefold()
     final_video = args.output if args.output is not None else random_videoname()
     final_extension = os.path.splitext(final_video)[1].casefold()

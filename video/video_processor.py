@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# video_processor.py,v1.0.1
+# video_processor.py,v1.0.2
 
 # Copyright (c) 2021 Thomas Ward <thomas@thomasward.com>
 #

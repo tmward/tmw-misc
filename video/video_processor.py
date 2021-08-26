@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# video_processor.py,v1.0.2
+# video_processor.py,v1.0.3
 
 # Copyright (c) 2021 Thomas Ward <thomas@thomasward.com>
 #
@@ -155,7 +155,7 @@ def ffprobe(filename):
     )
 
 
-def make_workdir(directory):
+def make_workdir(directory="."):
     """Makes temporary working directory in directory."""
     try:
         workdir = mkdtemp(dir=directory)
@@ -381,7 +381,7 @@ def main():
     videos = [f for f in sorted(os.listdir()) if is_video(f)]
     if len(videos) == 0:
         stderr_and_exit(f"No video files found in '{os.getcwd()}'.")
-    workdir = make_workdir(args.directory)
+    workdir = make_workdir()
     # gen random names for videos to live in temporary "workdir"
     next_name = partial(random_videoname, directory=workdir)
     og_extension = os.path.splitext(videos[0])[1].casefold()

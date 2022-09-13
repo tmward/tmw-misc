@@ -22,6 +22,21 @@ sequence from i is one to n.
 I mainly use it to generate LaTeX formulas into vector graphics that are
 then used on my website.
 
+# `outlook_emails.py`
+Script that will take the clipboard contents
+from the copied names and emails from an outlook recipients list and returns,
+in the clipboard copy buffer, a two-column
+tab-separated text of:
+
+```
+"name\temail"
+"name2\temail2"
+...
+"name_last\temail_last"
+```
+
+which you can copy into a spreadsheet.
+
 # R
 
 Collection of scripts useful when programming in R.

@@ -17,9 +17,7 @@ def tidy_patient_class(s):
         "Surgery Admit": "Admit",
         "Day Surgery": "Day",
     }
-    if s in class_to_abbrev:
-        return class_to_abbrev[s]
-    return s
+    return class_to_abbrev.get(s, s)
 
 
 def tidy_patient_name(s):

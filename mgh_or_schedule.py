@@ -1,35 +1,48 @@
 #!/usr/bin/env python3
+
+"""
+Take the clipboard contents copied from "My Cases" in Epic and produces a nicely
+formated table, which it saves to the copy/paste buffer to use in a spreadsheet
+software.
+"""
 import csv
-import pprint as pp
+from pprint import pprint
 import re
 import pyperclip
 
 
 def tidy_patient_class(s):
-    if s == "Post Procedure Recovery":
-        return "PPR"
-    elif s == "Surgery Admit":
-        return "Admit"
-    elif s == "Day Surgery":
-        return "Day"
-    else:
-        return s
+    """Abbreviate patient class column."""
+    class_to_abbrev = {
+        "Post Procedure Recovery": "PPR",
+        "Surgery Admit": "Admit",
+        "Day Surgery": "Day",
+    }
+    if s in class_to_abbrev:
+        return class_to_abbrev["s"]
+    return s
 
 
 def tidy_patient_name(s):
+    """Remove 'preferred names' in quotes from names."""
     return re.sub(r"\".+?\" ", "", s)
 
 
 def tidy_procedure(s):
+    """Remove procedure code [NNNN] from procedure."""
     return re.sub(r" \[\d+\]", "", s)
 
 
 def tidy_room(s):
+    """Make MGW OR NN a more clear "WALTHMAM OR NN."""
     return re.sub(r"MGW", "WALTHAM", s)
 
 
 def tidy_surgeons(s):
+    """Only keep surgeon last name. When 2 surgeons, separate with /."""
     # Matches last name of either 1 or 2 surgeons
+    # Will need to fix if 3+ surgeons encountered
+    # surgeon names are "Last Names, First M; Last Names2, First2 M2"
     surgeon_regex = re.compile(r"(^.+?),.*?(; (.+?),.+)?$")
     surgeon_match = surgeon_regex.fullmatch(s).groups()
     if surgeon_match[2]:
@@ -38,8 +51,10 @@ def tidy_surgeons(s):
 
 
 def main():
+    """Take OR table clipboard contents, format nicely, & put into clipboard buffer."""
 
     dat = pyperclip.paste().split("\r\n")[2:]
+
     final_dat = []
     ms_dat = []
     # useful to see if rows aren't full length due to mult surgeons
@@ -60,12 +75,14 @@ def main():
         # multiple lines
         else:
             ms_dat.append(row)
+
     # little janky, only works with 2 surgeons so far
     # merges the two surgeon two rows into one row
     n = 0
     while n < len(ms_dat):
         final_dat.append(ms_dat[n] + "; " + ms_dat[n + 1])
         n = n + 2
+
     # tidy
     tidiers = {
         "Patient Class": tidy_patient_class,

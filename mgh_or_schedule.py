@@ -93,7 +93,6 @@ def tidy(cases):
         "Surgeons": tidy_surgeons,
         "Time": str,
     }
-
     tidied_cases = []
     for row in csv.DictReader(cases, dialect="excel-tab"):
         # Add on cases have no "OR NN" so make it "Add On"
@@ -104,7 +103,6 @@ def tidy(cases):
             if k in tidiers:
                 tidied_case[k] = tidiers[k](v)
         tidied_cases.append(tidied_case)
-
     return tidied_cases
 
 
@@ -132,7 +130,7 @@ def main():
     # take pasted input, with new rows represented with linebreaks, split it,
     # and throw out first two rows as they are nonsense always
     # ss_dat, ms_dat = extract_data(pyperclip.paste().split("\r\n")[2:])
-    cases = extract_cases(pyperclip.paste().splitlines()[2:])
+    cases = extract_cases(pyperclip.paste().splitlines()[3:])
     tidied_case_dicts = tidy(cases)
     pyperclip.copy(make_pastable_tsv(tidied_case_dicts))
 
